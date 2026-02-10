@@ -108,7 +108,9 @@ async function processMessage(userText) {
 
 function speak(text) {
     const cleanText = text.replace(/[*#]/g, '');
-    const utterance = new SpeechSynthesisUtterance(cleanText);
+    const speechText = stripLinksForSpeech(cleanText);
+    if (!speechText.trim()) return;
+    const utterance = new SpeechSynthesisUtterance(speechText);
     utterance.lang = 'ru-RU';
     utterance.rate = 1.1;
 
@@ -125,6 +127,14 @@ function speak(text) {
     };
 
     synth.speak(utterance);
+}
+
+function stripLinksForSpeech(text) {
+    let result = text;
+    result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1'); // keep link text
+    result = result.replace(/https?:\/\/\S+/g, '');
+    result = result.replace(/www\.\S+/g, '');
+    return result;
 }
 
 function stopAI() {
