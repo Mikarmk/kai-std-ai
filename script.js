@@ -1,7 +1,7 @@
 import { KAIST_VOICE_CONTEXT, KAIST_CHAT_CONTEXT } from './knowledge_base.js';
 
 const CONFIG = {
-    apiKey: 'sk-vodSDofUMBExEi7sSWgcjELLCuF2urkI',
+    apiKey: 'sk-KBBOK5OijPFvetFbyk1VLuvAXCFO6qHD',
     baseUrl: 'https://api.proxyapi.ru/openai/v1',
     model: 'gpt-4o-mini-search-preview',
     webSearchOptions: {
