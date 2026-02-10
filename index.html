@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КАИ AI Student Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="glass-container">
+        <header class="app-header">
+            <div class="logo">
+                <span class="kai-text">КНИТУ-КАИ</span><span class="ai-tag">AI PRO</span>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="voice-tab"><i class="fa-solid fa-headset"></i> Студент</button>
+                <button class="tab-btn" data-tab="chat-tab"><i class="fa-solid fa-message"></i> Чат</button>
+            </div>
+        </header>
+
+        <main id="voice-tab" class="content-section active">
+            <div class="avatar-stage">
+                <div class="glow-ring"></div>
+                
+                <svg class="student-svg" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="skinGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ffdbac" />
+                            <stop offset="100%" stop-color="#f1c27d" />
+                        </radialGradient>
+                        <linearGradient id="hoodieGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#007bff" />
+                            <stop offset="100%" stop-color="#004a99" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M40 240 Q40 190 100 190 Q160 190 160 240" fill="url(#hoodieGrad)" />
+                    <text x="100" y="225" fill="white" font-size="10" font-weight="bold" text-anchor="middle" opacity="0.7">КАИ</text>
+                    <rect x="85" y="160" width="30" height="25" fill="#e0ac69" />
+                    <path d="M60 80 Q60 170 100 170 Q140 170 140 80 Q140 30 100 30 Q60 30 60 80" fill="url(#skinGrad)" />
+                    <path d="M60 75 Q60 30 100 25 Q145 25 145 80 Q145 90 135 85 Q110 70 60 85" fill="#3d2b1f" />
+                    <g class="eyes-layer">
+                        <g id="eye-l">
+                            <ellipse cx="80" cy="100" rx="7" ry="9" fill="white" />
+                            <circle cx="80" cy="100" r="3.5" fill="#222" />
+                        </g>
+                        <g id="eye-r">
+                            <ellipse cx="120" cy="100" rx="7" ry="9" fill="white" />
+                            <circle cx="120" cy="100" r="3.5" fill="#222" />
+                        </g>
+                    </g>
+                    <path id="mouth" d="M85 140 Q100 145 115 140" stroke="#442211" stroke-width="2.5" fill="none" stroke-linecap="round" />
+                </svg>
+
+                <div class="wave-visualizer" id="visualizer">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+            
+            <div class="live-captions">
+                <p id="assistant-speech">Привет! Я Денис. Есть вопросы по учёбе или КАИ?</p>
+            </div>
+
+            <div class="voice-footer">
+                <button id="main-mic-btn" class="mic-sphere">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <label>Нажми, чтобы сказать</label>
+            </div>
+        </main>
+
+        <main id="chat-tab" class="content-section">
+            <div id="chat-history" class="chat-flow"></div>
+            <div class="input-area">
+                <input type="text" id="text-input" placeholder="Задай вопрос текстом...">
+                <button id="send-text-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
