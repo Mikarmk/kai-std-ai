@@ -1,9 +1,20 @@
 import { KAIST_VOICE_CONTEXT, KAIST_CHAT_CONTEXT } from './knowledge_base.js';
 
 const CONFIG = {
-    apiKey: 'qmnavu5eu9jIgk0rFLdJKciCuSOjgJTH',
-    apiUrl: 'https://api.mistral.ai/v1/chat/completions',
-    model: 'mistral-large-latest'
+    apiKey: 'sk-vodSDofUMBExEi7sSWgcjELLCuF2urkI',
+    baseUrl: 'https://api.proxyapi.ru/openai/v1',
+    model: 'gpt-4o-mini-search-preview',
+    webSearchOptions: {
+        search_context_size: 'medium',
+        user_location: {
+            type: 'approximate',
+            approximate: {
+                country: 'RU',
+                city: 'Moscow',
+                region: 'Moscow'
+            }
+        }
+    }
 };
 
 // State
@@ -50,16 +61,14 @@ if (SpeechRecognition) {
 async function processMessage(userText) {
     if (!userText) return;
 
-    // Добавляем в историю (для памяти)
     chatHistory.push({ role: "user", content: userText });
     updateChatUI(userText, 'user');
 
     captionText.textContent = "Думаю...";
-    
     abortController = new AbortController();
 
     try {
-        const response = await fetch(CONFIG.apiUrl, {
+        const response = await fetch(`${CONFIG.baseUrl}/chat/completions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,50 +77,32 @@ async function processMessage(userText) {
             body: JSON.stringify({
                 model: CONFIG.model,
                 messages: chatHistory,
-                stream: true
+                web_search_options: CONFIG.webSearchOptions
             }),
             signal: abortController.signal
         });
 
-        let fullContent = "";
-        let sentenceBuffer = "";
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-
-        captionText.textContent = "";
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value);
-            const lines = chunk.split("\n");
-
-            for (const line of lines) {
-                if (line.startsWith("data: ") && line !== "data: [DONE]") {
-                    const json = JSON.parse(line.substring(6));
-                    const delta = json.choices[0]?.delta?.content || "";
-                    
-                    if (delta) {
-                        fullContent += delta;
-                        sentenceBuffer += delta;
-                        captionText.textContent = fullContent;
-
-                        // Озвучиваем по предложениям для плавности
-                        if (/[.!?\n]/.test(delta)) {
-                            speak(sentenceBuffer);
-                            sentenceBuffer = "";
-                        }
-                    }
-                }
-            }
+        if (!response.ok) {
+            throw new Error(`Проблемы с сетью (${response.status})`);
         }
 
-        chatHistory.push({ role: "assistant", content: fullContent });
-        updateChatUI(fullContent, 'bot');
+        const payload = await response.json();
+        const assistantText = payload.choices?.[0]?.message?.content?.trim() || "";
+
+        if (!assistantText) {
+            captionText.textContent = "Не удалось получить ответ.";
+            return;
+        }
+
+        chatHistory.push({ role: "assistant", content: assistantText });
+        updateChatUI(assistantText, 'bot');
+        captionText.textContent = assistantText;
+        speak(assistantText);
 
     } catch (e) {
-        if (e.name !== 'AbortError') captionText.textContent = "Произошла ошибка связи...";
+        if (e.name !== 'AbortError') {
+            captionText.textContent = "Произошла ошибка связи...";
+        }
     }
 }
 
@@ -147,7 +138,11 @@ function updateChatUI(text, sender) {
     const history = document.getElementById('chat-history');
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}`;
-    msgDiv.textContent = text;
+    if (sender === 'bot') {
+        msgDiv.innerHTML = marked.parse(text || '');
+    } else {
+        msgDiv.textContent = text;
+    }
     history.appendChild(msgDiv);
     history.scrollTop = history.scrollHeight;
 }
